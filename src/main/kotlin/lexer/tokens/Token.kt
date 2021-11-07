@@ -1,4 +1,4 @@
-package lexer
+package lexer.tokens
 
 sealed class Token
 
@@ -36,6 +36,10 @@ object TokenLeftBracket : Token() {
 
 object TokenRightBracket : Token() {
     override fun toString(): String = "RightBracket"
+}
+
+object TokenEot : Token() {
+    override fun toString(): String = "EOT"
 }
 
 data class TokenNumber(val value: Double) : Token() {

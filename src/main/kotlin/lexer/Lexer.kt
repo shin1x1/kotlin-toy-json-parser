@@ -1,15 +1,17 @@
 package lexer
 
+import lexer.tokens.*
+
 class Lexer(private val json: String, private var position: Int = 0) {
     fun getNextToken(): Result<Token> {
         return consume().fold(
             onSuccess = {
-                if (it == ' ') {
+                if (listOf(' ', '\t', '\r', '\n').contains(it)) {
                     return getNextToken()
                 }
                 return detectToken(it)
             },
-            onFailure = { Result.failure(it) }
+            onFailure = { Result.success(TokenEot) }
         )
     }
 
@@ -35,17 +37,12 @@ class Lexer(private val json: String, private var position: Int = 0) {
 
         val numbers = listOf('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-', '.', '+', 'e')
         while (true) {
-            val ch = peek()
-            if (ch.isFailure) {
+            val ch = peek().getOrNull() ?: break
+            if (!numbers.contains(ch)) {
                 break
             }
 
-            val c = ch.getOrNull() ?: break
-            if (!numbers.contains(c)) {
-                break
-            }
-
-            chs = chs.plus(c)
+            chs = chs.plus(ch)
             consume()
         }
 
@@ -57,19 +54,14 @@ class Lexer(private val json: String, private var position: Int = 0) {
 
         var hasBackslash = false
         while (true) {
-            val ch = peek()
-            if (ch.isFailure) {
-                break
-            }
-
-            val c = ch.getOrNull() ?: break
-            if (!hasBackslash && c == '"') {
+            val ch = peek().getOrNull() ?: break
+            if (!hasBackslash && ch == '"') {
                 consume()
                 break
             }
-            hasBackslash = c == '\\'
+            hasBackslash = ch == '\\'
 
-            chs = chs.plus(c)
+            chs = chs.plus(ch)
             consume()
         }
 
@@ -94,11 +86,11 @@ class Lexer(private val json: String, private var position: Int = 0) {
     }
 
     private fun peek(): Result<Char> {
-        if (position < json.length) {
-            return Result.success(json[position])
+        if (isEot()) {
+            return Result.failure(StringIndexOutOfBoundsException())
         }
 
-        return Result.failure(StringIndexOutOfBoundsException())
+        return Result.success(json[position])
     }
 
     private fun consume(): Result<Char> {
@@ -109,5 +101,7 @@ class Lexer(private val json: String, private var position: Int = 0) {
 
         return ch
     }
+
+    fun isEot(): Boolean = json.length <= position
 }
 

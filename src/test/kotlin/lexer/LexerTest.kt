@@ -1,5 +1,6 @@
 package lexer
 
+import lexer.tokens.*
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
@@ -7,7 +8,7 @@ import kotlin.test.assertIs
 class LexerTest {
     @Test
     fun getNextToken() {
-        val sut = Lexer("""[1,1.23,true,false,null]{"name": "Mike\"a"}""")
+        val sut = Lexer("""[1,1.23,true,false,null]""" + "\n\t\r" + """{"name": "Mike\"a"}""")
 
         assertEquals(TokenLeftBrace, sut.getNextToken().getOrThrow())
         assertEquals(TokenNumber(1.0), sut.getNextToken().getOrThrow())
@@ -27,7 +28,7 @@ class LexerTest {
         assertEquals(TokenString("Mike\\\"a"), sut.getNextToken().getOrThrow())
         assertEquals(TokenRightBracket, sut.getNextToken().getOrThrow())
 
-        assertIs<StringIndexOutOfBoundsException>(sut.getNextToken().exceptionOrNull())
+        assertEquals(TokenEot, sut.getNextToken().getOrThrow())
     }
 
     @Test
@@ -35,6 +36,6 @@ class LexerTest {
         val sut = Lexer("""tr!""")
 
         assertIs<InvalidLiteralException>(sut.getNextToken().exceptionOrNull())
-        assertIs<StringIndexOutOfBoundsException>(sut.getNextToken().exceptionOrNull())
+        assertEquals(TokenEot, sut.getNextToken().getOrThrow())
     }
 }

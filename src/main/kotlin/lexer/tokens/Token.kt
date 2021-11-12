@@ -38,10 +38,6 @@ object TokenRightBracket : Token() {
     override fun toString(): String = "RightBracket"
 }
 
-object TokenEot : Token() {
-    override fun toString(): String = "EOT"
-}
-
 data class TokenNumber(val value: Double) : Token() {
     override fun toString(): String = "Number:${value}"
 }

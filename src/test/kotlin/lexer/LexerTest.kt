@@ -3,6 +3,7 @@ package lexer
 import lexer.tokens.*
 import org.junit.Test
 import stream.CharacterStream
+import stream.EotException
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
 
@@ -30,7 +31,17 @@ class LexerTest {
         assertEquals(TokenString("あMike\\\"a"), sut.getNextToken().getOrThrow())
         assertEquals(TokenRightBracket, sut.getNextToken().getOrThrow())
 
-        assertEquals(TokenEot, sut.getNextToken().getOrThrow())
+        assertIs<EotException>(sut.getNextToken().exceptionOrNull())
+    }
+
+    @Test
+    fun getNextToken_invalid_token() {
+        val json = """[!]"""
+        val sut = Lexer(CharacterStream(json))
+
+        sut.getNextToken() // [
+        println(sut.getNextToken())
+//        assertIs<UnknownTokenException>(sut.getNextToken().exceptionOrNull())
     }
 
     @Test
@@ -39,6 +50,6 @@ class LexerTest {
         val sut = Lexer(CharacterStream(json))
 
         assertIs<InvalidLiteralException>(sut.getNextToken().exceptionOrNull())
-        assertEquals(TokenEot, sut.getNextToken().getOrThrow())
+        assertIs<EotException>(sut.getNextToken().exceptionOrNull())
     }
 }

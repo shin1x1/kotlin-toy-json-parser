@@ -12,7 +12,7 @@ class Lexer(private val stream: CharacterStream) {
                 }
                 return detectToken(it)
             },
-            onFailure = { Result.success(TokenEot) }
+            onFailure = { Result.failure(it) }
         )
     }
 
@@ -29,7 +29,7 @@ class Lexer(private val stream: CharacterStream) {
             't' -> lexLiteral("true", TokenTrue)
             'f' -> lexLiteral("false", TokenFalse)
             'n' -> lexLiteral("null", TokenNull)
-            else -> Result.failure(UnknownTokenException())
+            else -> Result.failure(UnknownTokenException(ch, stream.position, stream.readText()))
         }
     }
 

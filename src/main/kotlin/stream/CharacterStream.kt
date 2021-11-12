@@ -4,13 +4,19 @@ import java.io.InputStream
 
 class CharacterStream(inputStream: InputStream) {
     private val reader = inputStream.reader()
-    private var current: Int = reader.read()
+    private var current: Int = read()
+    private val readText = StringBuilder()
+
+    var position: Int = 0
+        private set
 
     companion object {
         operator fun invoke(json: String): CharacterStream {
             return CharacterStream(json.byteInputStream())
         }
     }
+
+    private fun read(): Int = reader.read()
 
     fun peek(): Result<Char> {
         return when (isEot()) {
@@ -22,8 +28,10 @@ class CharacterStream(inputStream: InputStream) {
     fun consume(): Result<Char> {
         val ch = peek()
 
-        if (ch.isSuccess) {
-            current = reader.read()
+        ch.onSuccess {
+            current = read()
+            readText.append(it)
+            position++
         }
 
         return ch
@@ -35,4 +43,6 @@ class CharacterStream(inputStream: InputStream) {
             else -> false
         }
     }
+
+    fun readText() = readText.toString()
 }

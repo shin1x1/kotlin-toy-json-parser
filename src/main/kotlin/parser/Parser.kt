@@ -3,6 +3,7 @@ package parser
 import lexer.Lexer
 import parser.values.JsonValue
 import parser.values.JsonValueNull
+import stream.EotException
 
 class Parser(private val lexer: Lexer) {
     fun parse(): Result<JsonValue> {
@@ -10,9 +11,16 @@ class Parser(private val lexer: Lexer) {
             return Result.success(JsonValueNull)
         }
 
+        val json = lexer.getNextToken().fold(
+            onSuccess = { token ->
+                ValueParser.parse(lexer, token).onFailure { return Result.failure(it) }
+            },
+            onFailure = { return Result.failure(it) }
+        )
+
         return lexer.getNextToken().fold(
-            onSuccess = { ValueParser.parse(lexer, it) },
-            onFailure = { Result.failure(it) }
+            onSuccess = { Result.failure(Exception("Some tokens are remained: $it")) },
+            onFailure = { if (it is EotException) json else Result.failure(it) }
         )
     }
 }

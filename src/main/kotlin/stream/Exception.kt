@@ -1,3 +1,3 @@
 package stream
 
-class EotException() : Exception()
+class EotException : Exception()

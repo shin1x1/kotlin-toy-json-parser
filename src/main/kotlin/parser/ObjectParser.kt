@@ -10,7 +10,7 @@ import parser.values.JsonValueObject
 
 object ObjectParser {
     private enum class State {
-        Default, Value, Comma, Colun, Key,
+        Default, Value, Comma, Colon, Key,
     }
 
     fun parse(lexer: Lexer): Result<JsonValueObject> {
@@ -33,11 +33,11 @@ object ObjectParser {
                 }
                 State.Key -> {
                     when (token) {
-                        TokenColon -> state = State.Colun
+                        TokenColon -> state = State.Colon
                         else -> return Result.failure(InvalidTokenException(token))
                     }
                 }
-                State.Colun -> {
+                State.Colon -> {
                     if (key.isEmpty()) return Result.failure(InvalidTokenException(token))
 
                     val ret = ValueParser.parse(lexer, token).getOrElse { return Result.failure(it) }

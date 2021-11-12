@@ -1,10 +1,11 @@
 package lexer
 
 import lexer.tokens.*
+import stream.CharacterStream
 
-class Lexer(private val json: String, private var position: Int = 0) {
+class Lexer(private val stream: CharacterStream) {
     fun getNextToken(): Result<Token> {
-        return consume().fold(
+        return stream.consume().fold(
             onSuccess = {
                 if (listOf(' ', '\t', '\r', '\n').contains(it)) {
                     return getNextToken()
@@ -37,13 +38,13 @@ class Lexer(private val json: String, private var position: Int = 0) {
 
         val numbers = listOf('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-', '.', '+', 'e')
         while (true) {
-            val ch = peek().getOrNull() ?: break
+            val ch = stream.peek().getOrNull() ?: break
             if (!numbers.contains(ch)) {
                 break
             }
 
             chs = chs.plus(ch)
-            consume()
+            stream.consume()
         }
 
         return Result.success(TokenNumber(chs.fold("") { c, acc -> c + acc }.toDouble()))
@@ -54,15 +55,15 @@ class Lexer(private val json: String, private var position: Int = 0) {
 
         var hasBackslash = false
         while (true) {
-            val ch = peek().getOrNull() ?: break
+            val ch = stream.peek().getOrNull() ?: break
             if (!hasBackslash && ch == '"') {
-                consume()
+                stream.consume()
                 break
             }
             hasBackslash = ch == '\\'
 
             chs = chs.plus(ch)
-            consume()
+            stream.consume()
         }
 
         return Result.success(TokenString(chs.fold("") { c, acc -> c + acc }))
@@ -70,7 +71,7 @@ class Lexer(private val json: String, private var position: Int = 0) {
 
     private fun lexLiteral(keyword: String, token: Token): Result<Token> {
         for (i in 2..keyword.length) {
-            consume().fold(
+            stream.consume().fold(
                 onSuccess = {
                     if (it != keyword[i - 1]) {
                         return Result.failure(InvalidLiteralException(it))
@@ -85,23 +86,6 @@ class Lexer(private val json: String, private var position: Int = 0) {
         return Result.success(token)
     }
 
-    private fun peek(): Result<Char> {
-        if (isEot()) {
-            return Result.failure(StringIndexOutOfBoundsException())
-        }
-
-        return Result.success(json[position])
-    }
-
-    private fun consume(): Result<Char> {
-        val ch = peek()
-        if (ch.isSuccess) {
-            position++
-        }
-
-        return ch
-    }
-
-    fun isEot(): Boolean = json.length <= position
+    fun isEot(): Boolean = stream.isEot()
 }
 

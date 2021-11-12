@@ -2,13 +2,15 @@ package lexer
 
 import lexer.tokens.*
 import org.junit.Test
+import stream.CharacterStream
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
 
 class LexerTest {
     @Test
     fun getNextToken() {
-        val sut = Lexer("""[1,1.23,true,false,null]""" + "\n\t\r" + """{"name": "Mike\"a"}""")
+        val json = """[1,1.23,true,false,null]""" + "\n\t\r" + """{"name": "あMike\"a"}"""
+        val sut = Lexer(CharacterStream(json))
 
         assertEquals(TokenLeftBrace, sut.getNextToken().getOrThrow())
         assertEquals(TokenNumber(1.0), sut.getNextToken().getOrThrow())
@@ -25,7 +27,7 @@ class LexerTest {
         assertEquals(TokenLeftBracket, sut.getNextToken().getOrThrow())
         assertEquals(TokenString("name"), sut.getNextToken().getOrThrow())
         assertEquals(TokenColon, sut.getNextToken().getOrThrow())
-        assertEquals(TokenString("Mike\\\"a"), sut.getNextToken().getOrThrow())
+        assertEquals(TokenString("あMike\\\"a"), sut.getNextToken().getOrThrow())
         assertEquals(TokenRightBracket, sut.getNextToken().getOrThrow())
 
         assertEquals(TokenEot, sut.getNextToken().getOrThrow())
@@ -33,7 +35,8 @@ class LexerTest {
 
     @Test
     fun getNextToken_invalid_literal() {
-        val sut = Lexer("""tr!""")
+        val json = """tr!"""
+        val sut = Lexer(CharacterStream(json))
 
         assertIs<InvalidLiteralException>(sut.getNextToken().exceptionOrNull())
         assertEquals(TokenEot, sut.getNextToken().getOrThrow())

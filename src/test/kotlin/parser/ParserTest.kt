@@ -11,7 +11,7 @@ import kotlin.test.assertSame
 class ParserTest {
     @Test
     fun parse() {
-        val json = """[null,true,false,[123,"abc"],{"name": {"no":1}}]"""
+        val json = """[null,true,false,[123,"abc",-23.2],{"name": {"no":10e2}}]"""
         val sut = Parser(Lexer(CharacterStream(json)))
 
         val array = listOf(
@@ -22,13 +22,14 @@ class ParserTest {
                 listOf(
                     JsonValueNumber(123.0),
                     JsonValueString("abc"),
+                    JsonValueNumber(-23.2),
                 )
             ),
             JsonValueObject(
                 mapOf(
                     "name" to JsonValueObject(
                         mapOf(
-                            "no" to JsonValueNumber(1.0)
+                            "no" to JsonValueNumber(1000.0)
                         )
                     )
                 )

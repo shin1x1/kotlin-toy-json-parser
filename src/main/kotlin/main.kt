@@ -1,6 +1,7 @@
 import lexer.Lexer
 import parser.Parser
 import stream.CharacterStream
+import kotlin.system.exitProcess
 
 fun main(args: Array<String>) {
     System.`in`.use {
@@ -8,5 +9,7 @@ fun main(args: Array<String>) {
         val json = Parser(lexer).parse()
 
         println(json)
+
+        json.onFailure { exitProcess(1) }
     }
 }

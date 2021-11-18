@@ -39,9 +39,9 @@ object TokenRightBracket : Token {
 }
 
 data class TokenNumber(val value: Double) : Token {
-    override fun toString(): String = "Number:${value}"
+    override fun toString(): String = "Number:$value"
 }
 
 data class TokenString(val value: String) : Token {
-    override fun toString(): String = "String:${value}"
+    override fun toString(): String = "String:$value"
 }

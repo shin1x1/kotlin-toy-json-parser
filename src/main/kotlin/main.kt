@@ -5,7 +5,7 @@ import java.io.File
 import kotlin.system.exitProcess
 
 fun main(args: Array<String>) {
-    val input = when(args.size) {
+    val input = when (args.size) {
         0 -> System.`in`
         else -> File(args[0]).inputStream()
     }

@@ -1,31 +1,31 @@
 package parser.values
 
-sealed class JsonValue
+sealed interface JsonValue
 
-object JsonValueTrue : JsonValue() {
+object JsonValueTrue : JsonValue {
     override fun toString(): String = "true"
 }
 
-object JsonValueFalse : JsonValue() {
+object JsonValueFalse : JsonValue {
     override fun toString(): String = "false"
 }
 
-object JsonValueNull : JsonValue() {
+object JsonValueNull : JsonValue {
     override fun toString(): String = "null"
 }
 
-data class JsonValueNumber(val value: Double) : JsonValue() {
+data class JsonValueNumber(val value: Double) : JsonValue {
     override fun toString(): String = "Number(${value})"
 }
 
-data class JsonValueString(val value: String) : JsonValue() {
+data class JsonValueString(val value: String) : JsonValue {
     override fun toString(): String = "String(${value})"
 }
 
-data class JsonValueArray(val value: List<JsonValue>) : JsonValue() {
+data class JsonValueArray(val value: List<JsonValue>) : JsonValue {
     override fun toString(): String = "Array(${value})"
 }
 
-data class JsonValueObject(val value: Map<String, JsonValue>) : JsonValue() {
+data class JsonValueObject(val value: Map<String, JsonValue>) : JsonValue {
     override fun toString(): String = "Object(${value})"
 }

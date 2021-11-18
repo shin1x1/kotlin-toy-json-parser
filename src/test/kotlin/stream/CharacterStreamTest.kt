@@ -28,9 +28,9 @@ class CharacterStreamTest {
     fun isEot() {
         val sut = CharacterStream("a")
 
-        assertTrue(sut.isEot())
-        sut.consume()
         assertFalse(sut.isEot())
+        sut.consume()
+        assertTrue(sut.isEot())
     }
 
     @Test

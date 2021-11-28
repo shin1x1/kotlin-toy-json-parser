@@ -1,20 +1,19 @@
 package parser
 
 import lexer.Lexer
-import lexer.tokens.*
-import parser.values.*
+import lexer.Token
 
 object ValueParser {
     fun parse(lexer: Lexer, token: Token): Result<JsonValue> {
         return when (token) {
-            TokenNull -> Result.success(JsonValueNull)
-            TokenTrue -> Result.success(JsonValueTrue)
-            TokenFalse -> Result.success(JsonValueFalse)
-            is TokenNumber -> Result.success(JsonValueNumber(token.value))
-            is TokenString -> Result.success(JsonValueString(token.value))
-            is TokenLeftBrace -> ArrayParser.parse(lexer)
-            is TokenLeftBracket -> ObjectParser.parse(lexer)
-            else -> Result.failure(InvalidTokenException(TokenNull))
+            Token.Null -> Result.success(JsonValue.Null)
+            Token.True -> Result.success(JsonValue.True)
+            Token.False -> Result.success(JsonValue.False)
+            is Token.Number -> Result.success(JsonValue.Number(token.value))
+            is Token.String -> Result.success(JsonValue.String(token.value))
+            is Token.LeftBrace -> ArrayParser.parse(lexer)
+            is Token.LeftBracket -> ObjectParser.parse(lexer)
+            else -> Result.failure(InvalidTokenException(Token.Null))
         }
     }
 }

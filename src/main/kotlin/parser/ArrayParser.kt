@@ -1,17 +1,14 @@
 package parser
 
 import lexer.Lexer
-import lexer.tokens.TokenComma
-import lexer.tokens.TokenRightBrace
-import parser.values.JsonValue
-import parser.values.JsonValueArray
+import lexer.Token
 
 object ArrayParser {
     private enum class State {
         Default, Value, Comma
     }
 
-    fun parse(lexer: Lexer): Result<JsonValue> {
+    fun parse(lexer: Lexer): Result<JsonValue.Array> {
         var state = State.Default
         var array = listOf<JsonValue>()
 
@@ -20,7 +17,7 @@ object ArrayParser {
             when (state) {
                 State.Default -> {
                     when (token) {
-                        TokenRightBrace -> return Result.success(JsonValueArray(array))
+                        Token.RightBrace -> return Result.success(JsonValue.Array(array))
                         else -> {
                             val ret = ValueParser.parse(lexer, token).getOrElse { return Result.failure(it) }
                             array = array.plus(ret)
@@ -30,8 +27,8 @@ object ArrayParser {
                 }
                 State.Value -> {
                     when (token) {
-                        TokenRightBrace -> return Result.success(JsonValueArray(array))
-                        TokenComma -> state = State.Comma
+                        Token.RightBrace -> return Result.success(JsonValue.Array(array))
+                        Token.Comma -> state = State.Comma
                         else -> return Result.failure(InvalidTokenException(token))
                     }
                 }

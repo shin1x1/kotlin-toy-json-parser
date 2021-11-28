@@ -2,7 +2,6 @@ package parser
 
 import lexer.Lexer
 import org.junit.Test
-import parser.values.*
 import stream.CharacterStream
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
@@ -11,32 +10,33 @@ import kotlin.test.assertSame
 class ParserTest {
     @Test
     fun parse() {
-        val json = """[null,true,false,[123,"abc",-23.2],{"name": {"no":10e2}}]"""
+        val json = """[null,true,false,[123,"abcあ",0,-23.2],{"name": {"no":10e2}}]"""
         val sut = Parser(Lexer(CharacterStream(json)))
 
         val array = listOf(
-            JsonValueNull,
-            JsonValueTrue,
-            JsonValueFalse,
-            JsonValueArray(
+            JsonValue.Null,
+            JsonValue.True,
+            JsonValue.False,
+            JsonValue.Array(
                 listOf(
-                    JsonValueNumber(123.0),
-                    JsonValueString("abc"),
-                    JsonValueNumber(-23.2),
+                    JsonValue.Number(123.0),
+                    JsonValue.String("abcあ"),
+                    JsonValue.Number(0.0),
+                    JsonValue.Number(-23.2),
                 )
             ),
-            JsonValueObject(
+            JsonValue.Object(
                 mapOf(
-                    "name" to JsonValueObject(
+                    "name" to JsonValue.Object(
                         mapOf(
-                            "no" to JsonValueNumber(1000.0)
+                            "no" to JsonValue.Number(1000.0)
                         )
                     )
                 )
             )
         )
 
-        assertEquals(JsonValueArray(array), sut.parse().getOrThrow())
+        assertEquals(JsonValue.Array(array), sut.parse().getOrThrow())
     }
 
     @Test
@@ -44,7 +44,7 @@ class ParserTest {
         val json = ""
         val sut = Parser(Lexer(CharacterStream(json)))
 
-        assertSame(JsonValueNull, sut.parse().getOrThrow())
+        assertSame(JsonValue.Null, sut.parse().getOrThrow())
     }
 
     @Test

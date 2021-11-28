@@ -1,14 +1,12 @@
 package parser
 
 import lexer.Lexer
-import parser.values.JsonValue
-import parser.values.JsonValueNull
 import stream.EotException
 
 class Parser(private val lexer: Lexer) {
     fun parse(): Result<JsonValue> {
         if (lexer.isEot()) {
-            return Result.success(JsonValueNull)
+            return Result.success(JsonValue.Null)
         }
 
         val json = lexer.getNextToken().fold(

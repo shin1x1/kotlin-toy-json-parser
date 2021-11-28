@@ -1,5 +1,5 @@
 package parser
 
-import lexer.tokens.Token
+import lexer.Token
 
 data class InvalidTokenException(val token: Token) : Exception()

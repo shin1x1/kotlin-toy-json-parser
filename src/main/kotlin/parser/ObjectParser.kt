@@ -1,19 +1,14 @@
 package parser
 
 import lexer.Lexer
-import lexer.tokens.TokenColon
-import lexer.tokens.TokenComma
-import lexer.tokens.TokenRightBracket
-import lexer.tokens.TokenString
-import parser.values.JsonValue
-import parser.values.JsonValueObject
+import lexer.Token
 
 object ObjectParser {
     private enum class State {
         Default, Value, Comma, Colon, Key,
     }
 
-    fun parse(lexer: Lexer): Result<JsonValueObject> {
+    fun parse(lexer: Lexer): Result<JsonValue.Object> {
         var state = State.Default
         var map = mapOf<String, JsonValue>()
         var key = ""
@@ -23,8 +18,8 @@ object ObjectParser {
             when (state) {
                 State.Default -> {
                     when (token) {
-                        TokenRightBracket -> return Result.success(JsonValueObject(map))
-                        is TokenString -> {
+                        Token.RightBracket -> return Result.success(JsonValue.Object(map))
+                        is Token.String -> {
                             key = token.value
                             state = State.Key
                         }
@@ -33,7 +28,7 @@ object ObjectParser {
                 }
                 State.Key -> {
                     when (token) {
-                        TokenColon -> state = State.Colon
+                        Token.Colon -> state = State.Colon
                         else -> return Result.failure(InvalidTokenException(token))
                     }
                 }
@@ -46,14 +41,14 @@ object ObjectParser {
                 }
                 State.Value -> {
                     when (token) {
-                        TokenRightBracket -> return Result.success(JsonValueObject(map))
-                        TokenComma -> state = State.Comma
+                        Token.RightBracket -> return Result.success(JsonValue.Object(map))
+                        Token.Comma -> state = State.Comma
                         else -> return Result.failure(InvalidTokenException(token))
                     }
                 }
                 State.Comma -> {
                     when (token) {
-                        is TokenString -> {
+                        is Token.String -> {
                             key = token.value
                             state = State.Key
                         }

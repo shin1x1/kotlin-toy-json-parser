@@ -21,7 +21,7 @@ class Lexer(private val stream: CharacterStream) {
             ':' -> Result.success(TokenColon)
             ',' -> Result.success(TokenComma)
             '-' -> lexNumber(ch)
-            in '1'..'9' -> lexNumber(ch)
+            in '0'..'9' -> lexNumber(ch)
             '"' -> StringLexer.lex(stream)
             't' -> lexLiteral("true", TokenTrue)
             'f' -> lexLiteral("false", TokenFalse)
